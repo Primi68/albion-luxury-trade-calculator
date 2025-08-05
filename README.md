@@ -97,7 +97,7 @@
 
 ## 📞 문의
 
-프로젝트 링크: [https://github.com/[username]/albion-trade-optimizer](https://github.com/[username]/albion-trade-optimizer)
+프로젝트 링크: [https://github.com/Primi68/albion-trade-optimizer](https://github.com/Primi68/albion-trade-optimizer)
 
 ---
 
