@@ -24,7 +24,6 @@
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
         }
         
         .header {
@@ -32,6 +31,7 @@
             color: white;
             padding: 30px;
             text-align: center;
+            border-radius: 20px 20px 0 0;
         }
         
         .header h1 {
@@ -45,7 +45,72 @@
         }
         
         .content {
+            display: flex;
+            gap: 20px;
             padding: 40px;
+            align-items: flex-start;
+        }
+        
+        .main-content {
+            flex: 1;
+            order: 1;
+        }
+        
+        .sidebar {
+            width: 350px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+            order: 2;
+        }
+        
+        .sidebar h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+            text-align: center;
+        }
+        
+        .efficiency-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .efficiency-item.best {
+            border-left-color: #28a745;
+            background: #e8f5e8;
+        }
+        
+        .efficiency-item h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .efficiency-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .efficiency-value {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .efficiency-value.best {
+            color: #28a745;
         }
         
         .step-container {
@@ -280,6 +345,18 @@
         }
         
         @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: -1;
+                position: relative;
+                top: auto;
+                max-height: none;
+            }
+            
             .results-section {
                 grid-template-columns: 1fr;
             }
@@ -311,84 +388,89 @@
         </div>
         
         <div class="content">
-            <!-- 1단계: 아이템 가격 입력 -->
-            <div class="step-container">
-                <div class="step-header">
-                    <div class="step-number">1</div>
-                    <div class="step-title">현재 아이템 시세 입력</div>
-                </div>
-                <div class="step-content">
-                    <div class="mode-toggle">
-                        <button class="mode-btn active" onclick="setMode(93.5)">구매계약서 사용 (93.5%)</button>
-                        <button class="mode-btn" onclick="setMode(96)">일반 거래 (96%)</button>
+            <!-- 사이드바: 입력 폼 + 효율성 비교 -->
+            <div class="sidebar">
+                <!-- 거래 모드 선택 -->
+                <div style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 10px;">⚙️ 거래 모드</h3>
+                    <div class="mode-toggle" style="margin-bottom: 0;">
+                        <button class="mode-btn" onclick="setMode(93.5)" style="font-size: 12px; padding: 8px 12px;">구매계약서 (93.5%)</button>
+                        <button class="mode-btn active" onclick="setMode(96)" style="font-size: 12px; padding: 8px 12px;">일반거래 (96%)</button>
                     </div>
-                    <div class="price-grid">
-                        <div class="price-item">
-                            <h3>📦 2.5kg 아이템 (성공시 1,000원)</h3>
-                            <div class="price-input-group">
-                                <input type="number" class="price-input" id="price-1" placeholder="예: 600" oninput="updateStep1()">
-                                <span>실버</span>
-                            </div>
+                </div>
+                
+                <!-- 아이템 시세 입력 -->
+                <div style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0;">💰 아이템 시세</h3>
+                        <button id="fetch-btn" onclick="fetchPrices()" style="padding: 6px 12px; border: 1px solid #667eea; background: white; color: #667eea; border-radius: 15px; cursor: pointer; font-size: 11px; font-weight: 600;" onmouseover="this.style.background='#667eea'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='#667eea'">🔄 실시간</button>
+                    </div>
+                    <div style="display: grid; gap: 12px;">
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">📦 2.5kg (1,000원)</div>
+                            <input type="number" class="price-input" id="price-1" placeholder="600" oninput="updateInputs()" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
                         </div>
-                        <div class="price-item">
-                            <h3>📦 5kg 아이템 (성공시 5,000원)</h3>
-                            <div class="price-input-group">
-                                <input type="number" class="price-input" id="price-0" placeholder="예: 3000" oninput="updateStep1()">
-                                <span>실버</span>
-                            </div>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">📦 5kg (5,000원)</div>
+                            <input type="number" class="price-input" id="price-0" placeholder="3000" oninput="updateInputs()" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
                         </div>
-                        <div class="price-item">
-                            <h3>📦 6.3kg 아이템 (성공시 25,000원)</h3>
-                            <div class="price-input-group">
-                                <input type="number" class="price-input" id="price-2" placeholder="예: 15000" oninput="updateStep1()">
-                                <span>실버</span>
-                            </div>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">📦 6.3kg (25,000원)</div>
+                            <input type="number" class="price-input" id="price-2" placeholder="15000" oninput="updateInputs()" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- 2단계: 투자 금액 입력 -->
-            <div class="step-container">
-                <div class="step-header">
-                    <div class="step-number">2</div>
-                    <div class="step-title">투자 가능 금액 설정</div>
-                </div>
-                <div class="step-content">
-                    <div class="investment-section">
-                        <p style="margin-bottom: 15px; color: #666;">한 번의 무역에 투자할 수 있는 실버 금액을 입력하세요</p>
-                        <div>
-                            <input type="text" class="investment-input" id="investment-amount" placeholder="1,000,000" oninput="formatInvestmentInput()">
-                            <span style="font-size: 18px; color: #666;">실버</span>
-                        </div>
+                
+                <!-- 투자 금액 입력 -->
+                <div style="margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px;">💵 투자 금액</h3>
+                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                        <input type="text" id="investment-amount" placeholder="1,000,000" oninput="formatInvestmentInput()" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; text-align: center;">
+                        <div style="font-size: 11px; color: #666; text-align: center; margin-top: 5px;">실버</div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- 3단계: 최적화 실행 -->
-            <div class="step-container">
-                <div class="step-header">
-                    <div class="step-number">3</div>
-                    <div class="step-title">최적 세팅 찾기</div>
+                
+                <!-- 최적화 버튼 -->
+                <div style="margin-bottom: 25px; text-align: center;">
+                    <button class="optimize-btn" id="optimize-btn" onclick="findBothOptimalSettings()" disabled style="width: 100%; padding: 12px; font-size: 14px;">
+                        🔍 최적화 분석
+                    </button>
                 </div>
-                <div class="step-content">
-                    <div style="text-align: center;">
-                        <p style="margin-bottom: 20px; color: #666;">입력한 정보를 바탕으로 두 가지 최적화 방식을 비교해드립니다</p>
-                        <button class="optimize-btn" id="optimize-btn" onclick="findBothOptimalSettings()" disabled>
-                            🔍 최적 세팅 비교 분석
-                        </button>
-                        <div style="margin-top: 15px; font-size: 14px; color: #888;">
-                            <div>💰 수익률 최대화: 설정 투자금액 내에서 최고 수익률</div>
-                            <div>⚡ 효율성 최대화: 가장 적은 투자로 최대 수익 (리스크 고려)</div>
+                
+                <!-- 아이템별 효율성 -->
+                <div>
+                    <h3 id="sidebar-title" style="margin-bottom: 15px;">📊 아이템별 효율성</h3>
+                    <div id="efficiency-list">
+                        <div style="text-align: center; color: #888; padding: 20px; font-size: 12px;">
+                            시세를 입력하면<br>효율성이 표시됩니다
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- 4단계: 결과 확인 -->
+            <div class="main-content">
+            <!-- 설명 섹션 -->
+            <div class="step-container">
+                <div class="step-header">
+                    <div class="step-number">📊</div>
+                    <div class="step-title">알비온 명품 무역 최적화</div>
+                </div>
+                <div class="step-content">
+                    <div style="text-align: center; color: #666;">
+                        <p style="margin-bottom: 15px;">오른쪽 사이드바에서 시세와 투자금액을 입력하면</p>
+                        <p style="margin-bottom: 15px;">실시간으로 최적화 결과가 업데이트됩니다</p>
+                        <div style="margin-top: 20px; font-size: 14px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                            <div style="margin-bottom: 8px;">💰 <strong>수익률 최대화:</strong> 설정 투자금액 내에서 최고 수익률</div>
+                            <div>⚡ <strong>효율성 최대화:</strong> 가장 적은 투자로 최대 수익</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 최적화 결과 -->
             <div class="step-container hidden" id="results-container">
                 <div class="step-header">
-                    <div class="step-number">4</div>
+                    <div class="step-number">🏆</div>
                     <div class="step-title">최적화 결과</div>
                 </div>
                 <div class="step-content">
@@ -419,7 +501,10 @@
                     
                     <!-- 탈것 및 파이 가격 설정 -->
                     <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e9ecef; margin-bottom: 20px;">
-                        <h4 style="margin-bottom: 20px; color: #333; text-align: center;">🐂 황소 및 파이 가격 설정</h4>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h4 style="margin: 0; color: #333;">🐂 황소 및 파이 가격 설정</h4>
+                            <button id="fetch-mount-btn" onclick="fetchMountAndPiePrices()" style="padding: 6px 12px; border: 1px solid #667eea; background: white; color: #667eea; border-radius: 15px; cursor: pointer; font-size: 11px; font-weight: 600;" onmouseover="this.style.background='#667eea'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='#667eea'">🔄 실시간</button>
+                        </div>
                         
                         <!-- 황소 설정 -->
                         <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 30px;">
@@ -589,11 +674,21 @@
                     </div>
                 </div>
             </div>
+            </div> <!-- main-content 닫기 -->
         </div>
     </div>
 
     <script>
-        let currentRate = 93.5;
+        let currentRate = 96;
+        let isLoadingPrices = false;
+        
+        // API 설정
+        const API_BASE = 'https://east.albion-online-data.com/api/v2/stats/prices';
+        const TREASURE_ITEMS = 'TREASURE_RITUAL_RARITY1,TREASURE_RITUAL_RARITY2,TREASURE_RITUAL_RARITY3';
+        const MOUNT_ITEMS = 'T3_MOUNT_OX,T4_MOUNT_OX,T5_MOUNT_OX,T6_MOUNT_OX,T7_MOUNT_OX,T8_MOUNT_OX';
+        const PIE_ITEMS = 'T3_MEAL_PIE,T5_MEAL_PIE@1,T7_MEAL_PIE';
+        const FORT_STERLING = 'Fort Sterling';
+        const CAERLEON = 'Caerleon';
 
         const items = [
             { sellPrice: 5000, weight: 5, name: '5kg 아이템' },
@@ -661,15 +756,10 @@
             });
             event.target.classList.add('active');
             
-            updateStep1();
+            updateInputs();
         }
 
-        const updateStep1 = checkStepsCompletion;
-        const updateStep2 = checkStepsCompletion;
-
-
-
-        function checkStepsCompletion() {
+        function updateInputs() {
             const prices = [
                 parseFloat(document.getElementById('price-0').value) || 0,
                 parseFloat(document.getElementById('price-1').value) || 0,
@@ -683,7 +773,18 @@
             
             const optimizeBtn = document.getElementById('optimize-btn');
             optimizeBtn.disabled = !(hasPrice && hasInvestment);
+            
+            // 아이템별 효율성 업데이트
+            updateItemEfficiencies(prices);
+            
+            // 결과가 이미 표시된 상태라면 자동으로 업데이트
+            const resultsContainer = document.getElementById('results-container');
+            if (!resultsContainer.classList.contains('hidden') && hasPrice && hasInvestment) {
+                findBothOptimalSettings();
+            }
         }
+        
+
 
         function findBothOptimalSettings() {
             const efficiencySetting = findOptimalSetting('efficiency');
@@ -828,7 +929,6 @@
             `;
             
             document.getElementById('results-container').classList.remove('hidden');
-            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
         }
 
         function formatInvestmentInput() {
@@ -838,7 +938,7 @@
             
             let value = input.value.replace(/,/g, '');
             if (value === '' || isNaN(value)) {
-                updateStep2();
+                updateInputs();
                 return;
             }
             
@@ -853,7 +953,7 @@
             const newCursorPosition = Math.max(0, Math.min(newValue.length, cursorPosition + commaDiff));
             input.setSelectionRange(newCursorPosition, newCursorPosition);
             
-            updateStep2();
+            updateInputs();
         }
 
         function getInvestmentValue() {
@@ -865,80 +965,24 @@
         
         const translations = {
             ko: {
-                mainTitle: '🏪 알비온 명품 무역 최적화 계산기',
-                mainSubtitle: '단계별 가이드로 최적의 무역 수익을 찾아보세요',
-                settingsOpen: '가격 설정 및 정보 보기',
-                settingsClose: '가격 설정 및 정보 닫기',
-                step1Title: '현재 아이템 시세 입력',
-                step2Title: '투자 가능 금액 설정',
-                step3Title: '최적 세팅 찾기',
-                step4Title: '최적화 결과',
-                fixedCostTitle: '고정비 설정',
-                contractMode: '구매계약서 사용 (93.5%)',
+                contractMode: '구매계약서 (93.5%)',
                 normalMode: '일반 거래 (96%)',
-                item25kg: '📦 2.5kg 아이템 (성공시 1,000원)',
-                item5kg: '📦 5kg 아이템 (성공시 5,000원)',
-                item63kg: '📦 6.3kg 아이템 (성공시 25,000원)',
-                investmentDesc: '한 번의 무역에 투자할 수 있는 실버 금액을 입력하세요',
-                optimizeDesc: '입력한 정보를 바탕으로 두 가지 최적화 방식을 비교해드립니다',
-                optimizeBtn: '🔍 최적 세팅 비교 분석',
-                profitMax: '💰 수익률 최대화: 설정 투자금액 내에서 최고 수익률',
-                efficiencyMax: '⚡ 효율성 최대화: 가장 적은 투자로 최대 수익 (리스크 고려)',
+                optimizeBtn: '🔍 최적화 분석',
                 efficiencyTitle: '⚡ 효율성 최대화',
                 profitTitle: '💰 수익률 최대화',
-                settingsDesc: '탈것과 파이의 가격을 설정하세요 (빈 값은 기본값 사용)',
-                resetBtn: '기본값으로 초기화',
-                completeBtn: '설정 완료',
-                silver: '실버',
-                ox35Title: '🐂 3-5티어 황소',
-                ox68Title: '🐂 6-8티어 황소',
-                pieTitle: '🥧 파이 버프',
-                tier3Normal: '3T 일반', tier3Good: '3T 좋음', tier3Outstanding: '3T 뛰어남', tier3Excellent: '3T 우수함',
-                tier4Normal: '4T 일반', tier4Good: '4T 좋음', tier4Outstanding: '4T 뛰어남', tier4Excellent: '4T 우수함',
-                tier5Normal: '5T 일반', tier5Good: '5T 좋음', tier5Outstanding: '5T 뛰어남', tier5Excellent: '5T 우수함',
-                tier6Normal: '6T 일반', tier6Good: '6T 좋음', tier6Outstanding: '6T 뛰어남', tier6Excellent: '6T 우수함',
-                tier7Normal: '7T 일반', tier7Good: '7T 좋음', tier7Outstanding: '7T 뛰어남', tier7Excellent: '7T 우수함',
-                tier8Normal: '8T 일반', tier8Good: '8T 좋음', tier8Outstanding: '8T 뛰어남', tier8Excellent: '8T 우수함',
-                pieChicken: '3T 치킨', pieGoose: '5T 거위', piePork: '7T 돼지',
-                placeholder1: '예: 600', placeholder2: '예: 3000', placeholder3: '예: 15000'
+                settingsOpen: '가격 설정 및 정보 보기',
+                settingsClose: '가격 설정 및 정보 닫기',
+                efficiencyTitle: '📊 아이템별 효율성'
             },
             en: {
-                mainTitle: '🏪 Albion Luxury Trade Optimizer',
-                mainSubtitle: 'Find optimal trade profits with step-by-step guidance',
-                settingsOpen: 'Price Settings & Info',
-                settingsClose: 'Close Settings & Info',
-                step1Title: 'Enter Current Item Prices',
-                step2Title: 'Set Investment Amount',
-                step3Title: 'Find Optimal Settings',
-                step4Title: 'Optimization Results',
-                fixedCostTitle: 'Fixed Cost Settings',
                 contractMode: 'Purchase Contract (93.5%)',
                 normalMode: 'Normal Trade (96%)',
-                item25kg: '📦 2.5kg Item (1,000 on success)',
-                item5kg: '📦 5kg Item (5,000 on success)',
-                item63kg: '📦 6.3kg Item (25,000 on success)',
-                investmentDesc: 'Enter the silver amount you can invest in one trade',
-                optimizeDesc: 'Compare two optimization methods based on your input',
                 optimizeBtn: '🔍 Analyze Optimal Settings',
-                profitMax: '💰 Profit Maximization: Highest profit rate within set investment',
-                efficiencyMax: '⚡ Efficiency Maximization: Maximum profit with minimal investment (risk considered)',
                 efficiencyTitle: '⚡ Efficiency Maximization',
                 profitTitle: '💰 Profit Maximization',
-                settingsDesc: 'Set mount and pie prices (empty values use defaults)',
-                resetBtn: 'Reset to Defaults',
-                completeBtn: 'Complete Settings',
-                silver: 'Silver',
-                ox35Title: '🐂 Tier 3-5 Oxen',
-                ox68Title: '🐂 Tier 6-8 Oxen',
-                pieTitle: '🥧 Pie Buffs',
-                tier3Normal: 'T3 Normal', tier3Good: 'T3 Good', tier3Outstanding: 'T3 Outstanding', tier3Excellent: 'T3 Excellent',
-                tier4Normal: 'T4 Normal', tier4Good: 'T4 Good', tier4Outstanding: 'T4 Outstanding', tier4Excellent: 'T4 Excellent',
-                tier5Normal: 'T5 Normal', tier5Good: 'T5 Good', tier5Outstanding: 'T5 Outstanding', tier5Excellent: 'T5 Excellent',
-                tier6Normal: 'T6 Normal', tier6Good: 'T6 Good', tier6Outstanding: 'T6 Outstanding', tier6Excellent: 'T6 Excellent',
-                tier7Normal: 'T7 Normal', tier7Good: 'T7 Good', tier7Outstanding: 'T7 Outstanding', tier7Excellent: 'T7 Excellent',
-                tier8Normal: 'T8 Normal', tier8Good: 'T8 Good', tier8Outstanding: 'T8 Outstanding', tier8Excellent: 'T8 Excellent',
-                pieChicken: 'T3 Chicken', pieGoose: 'T5 Goose', piePork: 'T7 Pork',
-                placeholder1: 'e.x. 600', placeholder2: 'e.x. 3000', placeholder3: 'e.x. 15000'
+                settingsOpen: 'Price Settings & Info',
+                settingsClose: 'Close Settings & Info',
+                efficiencyTitle: '📊 Item Efficiency'
             }
         };
         
@@ -946,74 +990,39 @@
             currentLanguage = lang;
             const t = translations[lang];
             
-            // 메인 타이틀
-            document.getElementById('main-title').textContent = t.mainTitle;
-            document.getElementById('main-subtitle').textContent = t.mainSubtitle;
-            
-            // 단계 제목들
-            document.querySelectorAll('.step-title')[0].textContent = t.step1Title;
-            document.querySelectorAll('.step-title')[1].textContent = t.step2Title;
-            document.querySelectorAll('.step-title')[2].textContent = t.step3Title;
-            document.querySelectorAll('.step-title')[3].textContent = t.step4Title;
-            document.querySelectorAll('.step-title')[4].textContent = t.fixedCostTitle;
-            
             // 모드 버튼
-            document.querySelectorAll('.mode-btn')[0].textContent = t.contractMode;
-            document.querySelectorAll('.mode-btn')[1].textContent = t.normalMode;
+            const modeBtns = document.querySelectorAll('.mode-btn');
+            if (modeBtns[0]) modeBtns[0].textContent = t.contractMode;
+            if (modeBtns[1]) modeBtns[1].textContent = t.normalMode;
             
-            // 아이템 제목 및 placeholder
-            document.querySelectorAll('.price-item h3')[0].textContent = t.item25kg;
-            document.querySelectorAll('.price-item h3')[1].textContent = t.item5kg;
-            document.querySelectorAll('.price-item h3')[2].textContent = t.item63kg;
+            // 최적화 버튼
+            const optimizeBtn = document.getElementById('optimize-btn');
+            if (optimizeBtn) optimizeBtn.textContent = t.optimizeBtn;
             
-            // placeholder 텍스트
-            document.getElementById('price-1').placeholder = t.placeholder1;
-            document.getElementById('price-0').placeholder = t.placeholder2;
-            document.getElementById('price-2').placeholder = t.placeholder3;
-            
-            // 설명 텍스트
-            document.querySelector('.investment-section p').textContent = t.investmentDesc;
-            document.querySelector('#optimize-btn').previousElementSibling.textContent = t.optimizeDesc;
-            document.querySelector('#optimize-btn').textContent = t.optimizeBtn;
-            
-            // 최적화 설명
-            document.querySelectorAll('#optimize-btn + div div')[0].textContent = t.profitMax;
-            document.querySelectorAll('#optimize-btn + div div')[1].textContent = t.efficiencyMax;
-            
-            // 실버 텍스트 (최적화)
-            document.querySelectorAll('.price-input-group span, .investment-section span').forEach(span => {
-                if (span.textContent.includes('실버')) span.textContent = t.silver;
-            });
-            
-            // 설정 버튼 및 설명
+            // 설정 버튼
             const settingsPanel = document.getElementById('settings-panel');
             const settingsBtn = document.getElementById('settings-btn');
-            settingsBtn.textContent = settingsPanel.classList.contains('hidden') ? t.settingsOpen : t.settingsClose;
-            
-            // 설정 패널 번역 (간소화)
-            const desc = settingsPanel?.querySelector('p');
-            if (desc) desc.textContent = t.settingsDesc;
-            
-            const titles = settingsPanel?.querySelectorAll('h4, h5');
-            if (titles) {
-                titles[0] && (titles[0].textContent = '🐂 황소 및 파이 가격 설정');
-                titles[7] && (titles[7].textContent = '🥧 파이 버프');
+            if (settingsBtn && settingsPanel) {
+                settingsBtn.textContent = settingsPanel.classList.contains('hidden') ? t.settingsOpen : t.settingsClose;
             }
             
-            const buttons = settingsPanel?.querySelectorAll('button');
-            if (buttons) {
-                buttons[0] && (buttons[0].textContent = t.resetBtn);
-                buttons[1] && (buttons[1].textContent = t.completeBtn);
-            }
+            // 사이드바 제목
+            const sidebarTitle = document.getElementById('sidebar-title');
+            if (sidebarTitle) sidebarTitle.textContent = t.efficiencyTitle;
             
-            // 언어 버튼 스타일 업데이트
-            document.getElementById('lang-ko').style.background = lang === 'ko' ? 'white' : 'transparent';
-            document.getElementById('lang-ko').style.color = lang === 'ko' ? '#667eea' : 'white';
-            document.getElementById('lang-ko').style.borderColor = lang === 'ko' ? 'white' : 'rgba(255,255,255,0.5)';
+            // 언어 버튼 스타일
+            const langKo = document.getElementById('lang-ko');
+            const langEn = document.getElementById('lang-en');
             
-            document.getElementById('lang-en').style.background = lang === 'en' ? 'white' : 'transparent';
-            document.getElementById('lang-en').style.color = lang === 'en' ? '#667eea' : 'white';
-            document.getElementById('lang-en').style.borderColor = lang === 'en' ? 'white' : 'rgba(255,255,255,0.5)';
+            langKo.style.background = lang === 'ko' ? 'white' : 'transparent';
+            langKo.style.color = lang === 'ko' ? '#667eea' : 'white';
+            langKo.style.borderColor = lang === 'ko' ? 'white' : 'rgba(255,255,255,0.5)';
+            
+            langEn.style.background = lang === 'en' ? 'white' : 'transparent';
+            langEn.style.color = lang === 'en' ? '#667eea' : 'white';
+            langEn.style.borderColor = lang === 'en' ? 'white' : 'rgba(255,255,255,0.5)';
+            
+            updateInputs();
         }
         
         function toggleSettings() {
@@ -1024,9 +1033,6 @@
             panel.classList.toggle('hidden');
             btn.textContent = panel.classList.contains('hidden') ? t.settingsOpen : t.settingsClose;
         }
-
-
-
         function formatMountPrice(mountKey, value) {
             const input = document.getElementById(mountKey + '_price');
             const cursorPosition = input.selectionStart;
@@ -1077,6 +1083,76 @@
             pies[pieKey].price = numericValue;
         }
 
+        // API에서 가격 데이터 가져오기
+        async function fetchPrices() {
+            if (isLoadingPrices) return;
+            isLoadingPrices = true;
+            
+            const btn = document.getElementById('fetch-btn');
+            btn.textContent = '⏳ 로딩중...';
+            btn.disabled = true;
+            
+            try {
+                // 명품 아이템 가격 (포트 스텔링에서 구매)
+                const treasureResponse = await fetch(`${API_BASE}/${TREASURE_ITEMS}.json?locations=${FORT_STERLING}&qualities=1`);
+                const treasureData = await treasureResponse.json();
+                
+                // 데이터 업데이트
+                updateTreasurePrices(treasureData);
+                
+                // 입력 필드 업데이트
+                updateInputs();
+                
+                // 성공 메시지
+                btn.textContent = '✓ 업데이트 완료';
+                btn.style.background = '#28a745';
+                btn.style.color = 'white';
+                btn.style.borderColor = '#28a745';
+                
+                setTimeout(() => {
+                    btn.textContent = '🔄 실시간';
+                    btn.style.background = 'white';
+                    btn.style.color = '#667eea';
+                    btn.style.borderColor = '#667eea';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('가격 데이터 로드 실패:', error);
+                
+                // 실패 메시지
+                btn.textContent = '❌ 연결 실패';
+                btn.style.background = '#dc3545';
+                btn.style.color = 'white';
+                btn.style.borderColor = '#dc3545';
+                
+                setTimeout(() => {
+                    btn.textContent = '🔄 실시간';
+                    btn.style.background = 'white';
+                    btn.style.color = '#667eea';
+                    btn.style.borderColor = '#667eea';
+                }, 3000);
+                
+            } finally {
+                isLoadingPrices = false;
+                btn.disabled = false;
+            }
+        }
+        
+        function updateTreasurePrices(data) {
+            const priceMap = {
+                'TREASURE_RITUAL_RARITY2': 'price-0',
+                'TREASURE_RITUAL_RARITY1': 'price-1',
+                'TREASURE_RITUAL_RARITY3': 'price-2'
+            };
+            
+            data.forEach(item => {
+                const inputId = priceMap[item.item_id];
+                if (inputId && item.sell_price_min > 0) {
+                    document.getElementById(inputId).value = item.sell_price_min;
+                }
+            });
+        }
+        
         function resetMountPrices() {
             Object.keys(defaultMountPrices).forEach(key => {
                 mounts[key].price = defaultMountPrices[key];
@@ -1090,10 +1166,175 @@
             });
         }
 
+        function updateItemEfficiencies(prices) {
+            const efficiencyList = document.getElementById('efficiency-list');
+            const t = translations[currentLanguage];
+            const isKo = currentLanguage === 'ko';
+            
+            if (!prices.some(p => p > 0)) {
+                efficiencyList.innerHTML = `
+                    <div style="text-align: center; color: #888; padding: 20px;">
+                        ${isKo ? '아이템 가격을 입력하면<br>효율성이 표시됩니다' : 'Enter item prices to see<br>efficiency comparison'}
+                    </div>
+                `;
+                return;
+            }
+            
+            const efficiencies = [];
+            
+            items.forEach((item, index) => {
+                const itemPrice = prices[index];
+                if (itemPrice <= 0) return;
+                
+                const revenue = item.sellPrice * (currentRate / 100);
+                const profit = revenue - itemPrice;
+                const profitPerKg = profit / item.weight;
+                const profitPerSilver = profit / itemPrice;
+                
+                efficiencies.push({
+                    item,
+                    itemPrice,
+                    profit,
+                    profitPerKg,
+                    profitPerSilver,
+                    index
+                });
+            });
+            
+            // kg당 수익으로 정렬
+            efficiencies.sort((a, b) => b.profitPerKg - a.profitPerKg);
+            
+            let html = '';
+            efficiencies.forEach((eff, rank) => {
+                const isBest = rank === 0;
+                const itemName = isKo ? eff.item.name : eff.item.name.replace('아이템', 'Item');
+                
+                html += `
+                    <div class="efficiency-item ${isBest ? 'best' : ''}">
+                        <h4>${isBest ? '🏆 ' : ''}${itemName}</h4>
+                        <div class="efficiency-stats">
+                            <span>${isKo ? 'kg당 수익:' : 'Profit/kg:'}</span>
+                            <span class="efficiency-value ${isBest ? 'best' : ''}">${Math.round(eff.profitPerKg).toLocaleString()}</span>
+                        </div>
+                        <div class="efficiency-stats">
+                            <span>${isKo ? '실버당 수익:' : 'Profit/Silver:'}</span>
+                            <span class="efficiency-value ${isBest ? 'best' : ''}">${(eff.profitPerSilver * 100).toFixed(1)}%</span>
+                        </div>
+                        <div class="efficiency-stats">
+                            <span>${isKo ? '가격:' : 'Price:'}</span>
+                            <span>${eff.itemPrice.toLocaleString()}${isKo ? '실버' : ' Silver'}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            efficiencyList.innerHTML = html;
+        }
+        
+        async function fetchMountAndPiePrices() {
+            const fetchBtn = document.getElementById('fetch-mount-btn');
+            const originalText = fetchBtn.innerHTML;
+            fetchBtn.innerHTML = '⏳ 로딩...';
+            fetchBtn.disabled = true;
+            
+            try {
+                // 탈것 가격 가져오기 (포트 스텔링에서 구매가)
+                const mountResponse = await fetch(`${API_BASE}/${MOUNT_ITEMS}?locations=${FORT_STERLING}&qualities=1,2,3,4`);
+                const mountData = await mountResponse.json();
+                
+                // 파이 가격 가져오기 (포트 스텔링에서 구매가)
+                const pieResponse = await fetch(`${API_BASE}/${PIE_ITEMS}?locations=${FORT_STERLING}`);
+                const pieData = await pieResponse.json();
+                
+                // 탈것 가격 업데이트
+                const mountMapping = {
+                    'T3_MOUNT_OX': ['ox3_normal', 'ox3_good', 'ox3_outstanding', 'ox3_excellent'],
+                    'T4_MOUNT_OX': ['ox4_normal', 'ox4_good', 'ox4_outstanding', 'ox4_excellent'],
+                    'T5_MOUNT_OX': ['ox5_normal', 'ox5_good', 'ox5_outstanding', 'ox5_excellent'],
+                    'T6_MOUNT_OX': ['ox6_normal', 'ox6_good', 'ox6_outstanding', 'ox6_excellent'],
+                    'T7_MOUNT_OX': ['ox7_normal', 'ox7_good', 'ox7_outstanding', 'ox7_excellent'],
+                    'T8_MOUNT_OX': ['ox8_normal', 'ox8_good', 'ox8_outstanding', 'ox8_excellent']
+                };
+                
+                Object.entries(mountMapping).forEach(([itemId, qualities]) => {
+                    qualities.forEach((qualityId, index) => {
+                        const quality = index + 1;
+                        const itemData = mountData.find(item => 
+                            item.item_id === itemId && 
+                            item.city === FORT_STERLING &&
+                            item.quality === quality
+                        );
+                        
+                        if (itemData && itemData.sell_price_min > 0) {
+                            const input = document.getElementById(qualityId + '_price');
+                            if (input) {
+                                input.value = itemData.sell_price_min.toLocaleString();
+                                mounts[qualityId].price = itemData.sell_price_min;
+                            }
+                        }
+                    });
+                });
+                
+                // 파이 가격 업데이트
+                const pieMapping = {
+                    'T3_MEAL_PIE': 'chicken',
+                    'T5_MEAL_PIE@1': 'goose',
+                    'T7_MEAL_PIE': 'pork'
+                };
+                
+                Object.entries(pieMapping).forEach(([itemId, pieType]) => {
+                    const itemData = pieData.find(item => 
+                        item.item_id === itemId && 
+                        item.city === FORT_STERLING
+                    );
+                    
+                    if (itemData && itemData.sell_price_min > 0) {
+                        const input = document.getElementById(pieType + '_pie_price');
+                        if (input) {
+                            input.value = itemData.sell_price_min.toLocaleString();
+                            pies[pieType].price = itemData.sell_price_min;
+                        }
+                    }
+                });
+                
+                // 성공 메시지
+                fetchBtn.innerHTML = '✓ 완료';
+                fetchBtn.style.background = '#28a745';
+                fetchBtn.style.color = 'white';
+                
+                setTimeout(() => {
+                    fetchBtn.innerHTML = originalText;
+                    fetchBtn.style.background = 'white';
+                    fetchBtn.style.color = '#667eea';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('탈것/파이 가격 정보를 가져오는데 실패했습니다:', error);
+                
+                // 실패 메시지
+                fetchBtn.innerHTML = '❌ 실패';
+                fetchBtn.style.background = '#dc3545';
+                fetchBtn.style.color = 'white';
+                
+                setTimeout(() => {
+                    fetchBtn.innerHTML = originalText;
+                    fetchBtn.style.background = 'white';
+                    fetchBtn.style.color = '#667eea';
+                }, 3000);
+                
+            } finally {
+                fetchBtn.disabled = false;
+            }
+        }
+
         // 페이지 로드시 초기 설정
         window.onload = function() {
             document.getElementById('investment-amount').value = '1,000,000';
-            checkStepsCompletion();
+            document.getElementById('price-0').value = 2500;
+            document.getElementById('price-1').value = 500;
+            document.getElementById('price-2').value = 12500;
+            updateInputs();
+            fetchPrices();
         };
     </script>
 </body>
