@@ -42,9 +42,9 @@ Smart trading tool for optimal profits in Albion Online luxury trade system
 ## 🎮 Game Information
 
 **Supported Items:**
-- 2.5kg Item (1,000 Fame on success)
-- 5kg Item (5,000 Fame on success)
-- 6.3kg Item (25,000 Fame on success)
+- 2.5kg Item (1,000 silver on success)
+- 5kg Item (5,000 silver on success)
+- 6.3kg Item (25,000 silver on success)
 
 **Ox Tiers:** T3~T8 (Normal/Good/Outstanding/Excellent)
 **Pie Buffs:** Chicken (+10%), Goose (+20%), Pork (+30%)
