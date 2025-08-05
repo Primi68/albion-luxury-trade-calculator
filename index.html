@@ -677,6 +677,11 @@
             </div> <!-- main-content 닫기 -->
         </div>
     </div>
+    
+    <!-- API 출처 표시 -->
+    <div style="text-align: center; padding: 20px; color: #666; font-size: 12px; background: #f8f9fa;">
+        실시간 가격 데이터: <a href="https://www.albion-online-data.com" target="_blank" style="color: #667eea; text-decoration: none;">Albion Online Data Project</a>
+    </div>
 
     <script>
         let currentRate = 96;
@@ -1102,6 +1107,17 @@
                 
                 // 입력 필드 업데이트
                 updateInputs();
+                
+                // 자동 최적화 분석 실행
+                const investment = getInvestmentValue();
+                const prices = [
+                    parseFloat(document.getElementById('price-0').value) || 0,
+                    parseFloat(document.getElementById('price-1').value) || 0,
+                    parseFloat(document.getElementById('price-2').value) || 0
+                ];
+                if (investment > 0 && prices.some(p => p > 0)) {
+                    findBothOptimalSettings();
+                }
                 
                 // 성공 메시지
                 btn.textContent = '✓ 업데이트 완료';
