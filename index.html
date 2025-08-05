@@ -430,6 +430,25 @@
                     </div>
                 </div>
                 
+                <!-- 장비 적재량 입력 -->
+                <div style="margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px;">🎒 장비 적재량</h3>
+                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                        <input type="number" id="max-capacity" placeholder="미입력시 추천 탈것 적용" oninput="updateInputs()" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; text-align: center;">
+                        <div style="font-size: 11px; color: #666; text-align: center; margin-top: 5px;">kg (탈것+가방+신발 총 적재량)</div>
+                    </div>
+                </div>
+                
+                <!-- 탈것 비용 비율 설정 -->
+                <div style="margin-bottom: 25px;">
+                    <h3 style="margin-bottom: 15px;">💰 탈것 비용 비율</h3>
+                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px;">
+                        <input type="range" id="mount-cost-ratio" min="0" max="100" value="100" oninput="updateMountCostRatio()" style="width: 100%; margin-bottom: 8px;">
+                        <div style="text-align: center; font-size: 14px; font-weight: 600; color: #333;" id="mount-cost-display">100%</div>
+                        <div style="font-size: 11px; color: #666; text-align: center; margin-top: 5px;">탈것 가격의 몇% 비용 계산</div>
+                    </div>
+                </div>
+                
                 <!-- 최적화 버튼 -->
                 <div style="margin-bottom: 25px; text-align: center;">
                     <button class="optimize-btn" id="optimize-btn" onclick="findBothOptimalSettings()" disabled style="width: 100%; padding: 12px; font-size: 14px;">
@@ -798,7 +817,8 @@
             if (efficiencySetting && profitSetting) {
                 displayBothResults(efficiencySetting, profitSetting);
             } else {
-                alert('최적 세팅을 찾을 수 없습니다.');
+                console.log('최적 세팅을 찾을 수 없습니다. 투자금액이나 아이템 가격을 확인하세요.');
+                document.getElementById('results-container').classList.add('hidden');
             }
         }
         
@@ -813,58 +833,109 @@
             let bestSetting = null;
             let bestScore = mode === 'efficiency' ? -Infinity : -Infinity;
             
-            // 모든 탈것/파이 조합 테스트
-            Object.keys(mounts).forEach(mountKey => {
+            // 사용자 정의 적재량 확인
+            const userCapacity = parseFloat(document.getElementById('max-capacity').value) || 0;
+            
+            if (userCapacity > 0) {
+                // 사용자 정의 적재량 + 파이 버프 고려
                 Object.keys(pies).forEach(pieKey => {
-                    const mount = mounts[mountKey];
                     const pie = pies[pieKey];
-                    const actualCapacity = Math.floor(mount.capacity * (1 + pie.buff / 100));
-                    const fixedCost = mount.price + pie.price;
+                    const buffedCapacity = Math.floor(userCapacity * (1 + pie.buff / 100));
+                    const fixedCost = pie.price; // 사용자 장비는 파이 비용만 고려
                     
-                    // 각 아이템에 대해 최적 수량 계산
                     items.forEach((item, itemIndex) => {
                         const itemPrice = itemPrices[itemIndex];
                         if (itemPrice <= 0) return;
                         
-                        let maxQuantity, totalInvestment, availableForItems;
-                        
-                        // 두 모드 모두 투자금액 내에서 계산
                         if (fixedCost >= investmentAmount) return;
-                        availableForItems = investmentAmount - fixedCost;
+                        const availableForItems = investmentAmount - fixedCost;
                         const maxByMoney = Math.floor(availableForItems / itemPrice);
-                        const maxByWeight = Math.floor(actualCapacity / item.weight);
-                        maxQuantity = Math.min(maxByMoney, maxByWeight);
-                        totalInvestment = fixedCost + (maxQuantity * itemPrice);
+                        const maxByWeight = Math.floor(buffedCapacity / item.weight);
+                        const maxQuantity = Math.min(maxByMoney, maxByWeight);
                         
                         if (maxQuantity <= 0) return;
                         
                         const totalItemCost = maxQuantity * itemPrice;
                         const revenue = maxQuantity * item.sellPrice * (currentRate / 100);
                         const profit = revenue - totalItemCost - fixedCost;
+                        const totalInvestment = fixedCost + totalItemCost;
                         
                         let score;
                         if (mode === 'efficiency') {
-                            // 효율성: 실제 투자 대비 수익 비율 (적은 투자로 높은 수익)
                             score = totalInvestment > 0 ? profit / totalInvestment : 0;
                         } else {
-                            // 수익률: 설정된 투자금액 대비 수익률
                             score = (profit / investmentAmount) * 100;
                         }
                         
                         if (score > bestScore) {
                             bestScore = score;
                             bestSetting = {
-                                mode, mountKey, pieKey, itemIndex, quantity: maxQuantity,
-                                mount, pie, item, actualCapacity, fixedCost,
-                                totalItemCost, revenue, profit, 
-                                totalInvestment: totalInvestment,
+                                mode, mountKey: 'custom', pieKey, itemIndex, quantity: maxQuantity,
+                                mount: { name: '사용자 장비', capacity: userCapacity, price: 0 },
+                                pie, item, actualCapacity: buffedCapacity, fixedCost,
+                                totalItemCost, revenue, profit,
+                                totalInvestment,
                                 efficiency: (profit / totalInvestment) * 100,
                                 itemPrice, score
                             };
                         }
                     });
                 });
-            });
+            } else {
+                // 기존 황소/파이 조합 테스트
+                Object.keys(mounts).forEach(mountKey => {
+                    Object.keys(pies).forEach(pieKey => {
+                        const mount = mounts[mountKey];
+                        const pie = pies[pieKey];
+                        const actualCapacity = Math.floor(mount.capacity * (1 + pie.buff / 100));
+                        const mountCostRatio = parseFloat(document.getElementById('mount-cost-ratio').value) / 100;
+                        const fixedCost = (mount.price * mountCostRatio) + pie.price;
+                    
+                        // 각 아이템에 대해 최적 수량 계산
+                        items.forEach((item, itemIndex) => {
+                            const itemPrice = itemPrices[itemIndex];
+                            if (itemPrice <= 0) return;
+                            
+                            let maxQuantity, totalInvestment, availableForItems;
+                            
+                            // 두 모드 모두 투자금액 내에서 계산
+                            if (fixedCost >= investmentAmount) return;
+                            availableForItems = investmentAmount - fixedCost;
+                            const maxByMoney = Math.floor(availableForItems / itemPrice);
+                            const maxByWeight = Math.floor(actualCapacity / item.weight);
+                            maxQuantity = Math.min(maxByMoney, maxByWeight);
+                            totalInvestment = fixedCost + (maxQuantity * itemPrice);
+                            
+                            if (maxQuantity <= 0) return;
+                            
+                            const totalItemCost = maxQuantity * itemPrice;
+                            const revenue = maxQuantity * item.sellPrice * (currentRate / 100);
+                            const profit = revenue - totalItemCost - fixedCost;
+                            
+                            let score;
+                            if (mode === 'efficiency') {
+                                // 효율성: 실제 투자 대비 수익 비율 (적은 투자로 높은 수익)
+                                score = totalInvestment > 0 ? profit / totalInvestment : 0;
+                            } else {
+                                // 수익률: 설정된 투자금액 대비 수익률
+                                score = (profit / investmentAmount) * 100;
+                            }
+                            
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestSetting = {
+                                    mode, mountKey, pieKey, itemIndex, quantity: maxQuantity,
+                                    mount, pie, item, actualCapacity, fixedCost,
+                                    totalItemCost, revenue, profit, 
+                                    totalInvestment: totalInvestment,
+                                    efficiency: (profit / totalInvestment) * 100,
+                                    itemPrice, score
+                                };
+                            }
+                        });
+                    });
+                });
+            }
             
             return bestSetting;
         }
@@ -1027,6 +1098,12 @@
             langEn.style.color = lang === 'en' ? '#667eea' : 'white';
             langEn.style.borderColor = lang === 'en' ? 'white' : 'rgba(255,255,255,0.5)';
             
+            updateInputs();
+        }
+        
+        function updateMountCostRatio() {
+            const ratio = document.getElementById('mount-cost-ratio').value;
+            document.getElementById('mount-cost-display').textContent = ratio + '%';
             updateInputs();
         }
         
@@ -1349,6 +1426,7 @@
             document.getElementById('price-0').value = 2500;
             document.getElementById('price-1').value = 500;
             document.getElementById('price-2').value = 12500;
+            document.getElementById('max-capacity').value = '';
             updateInputs();
             fetchPrices();
         };
