@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>알비온 명품 무역 최적화 계산기</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .step-container {
+            margin-bottom: 40px;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .step-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .step-content {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .price-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .price-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .price-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+        
+        .price-item h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .price-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .price-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .price-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .investment-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            text-align: center;
+        }
+        
+        .investment-input {
+            width: 300px;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 18px;
+            text-align: center;
+            margin: 0 10px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .investment-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .optimize-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .optimize-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .optimize-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .results-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .optimal-result {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(79, 172, 254, 0.3);
+        }
+        
+        .optimal-result h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .optimal-details {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .calculation-result {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .calculation-result h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .result-value {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .profit-positive {
+            color: #28a745;
+        }
+        
+        .profit-negative {
+            color: #dc3545;
+        }
+        
+        .mode-toggle {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .mode-btn {
+            padding: 10px 20px;
+            margin: 0 10px;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            background: white;
+            color: #667eea;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .mode-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .results-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .price-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .investment-input {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1 id="main-title">🏪 알비온 명품 무역 최적화 계산기</h1>
+                    <p id="main-subtitle">단계별 가이드로 최적의 무역 수익을 찾아보세요</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="setLanguage('ko')" id="lang-ko" style="padding: 8px 12px; border: 2px solid white; background: white; color: #667eea; border-radius: 20px; cursor: pointer; font-weight: 600;">🇰🇷 한국어</button>
+                    <button onclick="setLanguage('en')" id="lang-en" style="padding: 8px 12px; border: 2px solid rgba(255,255,255,0.5); background: transparent; color: white; border-radius: 20px; cursor: pointer; font-weight: 600;">🇺🇸 English</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- 1단계: 아이템 가격 입력 -->
+            <div class="step-container">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">현재 아이템 시세 입력</div>
+                </div>
+                <div class="step-content">
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" onclick="setMode(93.5)">구매계약서 사용 (93.5%)</button>
+                        <button class="mode-btn" onclick="setMode(96)">일반 거래 (96%)</button>
+                    </div>
+                    <div class="price-grid">
+                        <div class="price-item">
+                            <h3>📦 2.5kg 아이템 (성공시 1,000원)</h3>
+                            <div class="price-input-group">
+                                <input type="number" class="price-input" id="price-1" placeholder="예: 600" oninput="updateStep1()">
+                                <span>실버</span>
+                            </div>
+                        </div>
+                        <div class="price-item">
+                            <h3>📦 5kg 아이템 (성공시 5,000원)</h3>
+                            <div class="price-input-group">
+                                <input type="number" class="price-input" id="price-0" placeholder="예: 3000" oninput="updateStep1()">
+                                <span>실버</span>
+                            </div>
+                        </div>
+                        <div class="price-item">
+                            <h3>📦 6.3kg 아이템 (성공시 25,000원)</h3>
+                            <div class="price-input-group">
+                                <input type="number" class="price-input" id="price-2" placeholder="예: 15000" oninput="updateStep1()">
+                                <span>실버</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 2단계: 투자 금액 입력 -->
+            <div class="step-container">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">투자 가능 금액 설정</div>
+                </div>
+                <div class="step-content">
+                    <div class="investment-section">
+                        <p style="margin-bottom: 15px; color: #666;">한 번의 무역에 투자할 수 있는 실버 금액을 입력하세요</p>
+                        <div>
+                            <input type="text" class="investment-input" id="investment-amount" placeholder="1,000,000" oninput="formatInvestmentInput()">
+                            <span style="font-size: 18px; color: #666;">실버</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 3단계: 최적화 실행 -->
+            <div class="step-container">
+                <div class="step-header">
+                    <div class="step-number">3</div>
+                    <div class="step-title">최적 세팅 찾기</div>
+                </div>
+                <div class="step-content">
+                    <div style="text-align: center;">
+                        <p style="margin-bottom: 20px; color: #666;">입력한 정보를 바탕으로 두 가지 최적화 방식을 비교해드립니다</p>
+                        <button class="optimize-btn" id="optimize-btn" onclick="findBothOptimalSettings()" disabled>
+                            🔍 최적 세팅 비교 분석
+                        </button>
+                        <div style="margin-top: 15px; font-size: 14px; color: #888;">
+                            <div>💰 수익률 최대화: 설정 투자금액 내에서 최고 수익률</div>
+                            <div>⚡ 효율성 최대화: 가장 적은 투자로 최대 수익 (리스크 고려)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 4단계: 결과 확인 -->
+            <div class="step-container hidden" id="results-container">
+                <div class="step-header">
+                    <div class="step-number">4</div>
+                    <div class="step-title">최적화 결과</div>
+                </div>
+                <div class="step-content">
+                    <div class="results-section">
+                        <div class="optimal-result">
+                            <h3>⚡ 효율성 최대화</h3>
+                            <div id="efficiency-details"></div>
+                        </div>
+                        <div class="calculation-result">
+                            <h3>💰 수익률 최대화</h3>
+                            <div id="profit-details"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 고정비 설정 -->
+            <div class="step-container">
+                <div class="step-header">
+                    <div class="step-number">🐂</div>
+                    <div class="step-title">고정비 설정</div>
+                    <button onclick="toggleSettings()" id="settings-btn" style="margin-left: auto; padding: 8px 20px; border: 2px solid #667eea; background: white; color: #667eea; border-radius: 25px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#667eea'; this.style.color='white'" onmouseout="this.style.background='white'; this.style.color='#667eea'">가격 설정 및 정보 보기</button>
+                </div>
+                <div class="step-content hidden" id="settings-panel" style="transition: all 0.3s ease;">
+                    <div style="text-align: center; margin-bottom: 20px; color: #666;">
+                        <p>탈것과 파이의 가격을 설정하세요 (빈 값은 기본값 사용)</p>
+                    </div>
+                    
+                    <!-- 탈것 및 파이 가격 설정 -->
+                    <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid #e9ecef; margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 20px; color: #333; text-align: center;">🐂 황소 및 파이 가격 설정</h4>
+                        
+                        <!-- 황소 설정 -->
+                        <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 15px; margin-bottom: 30px;">
+                            <!-- 3티어 -->
+                            <div style="text-align: center;">
+                                <h5 style="color: #667eea; font-weight: 600; margin-bottom: 10px;">3티어</h5>
+                                <div style="display: grid; gap: 8px;">
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">일반 (1,058kg)</div>
+                                        <input type="text" id="ox3_normal_price" value="13,000" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox3_normal', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">좋음 (1,120kg)</div>
+                                        <input type="text" id="ox3_good_price" value="13,000" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox3_good', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">뛰어남 (1,184kg)</div>
+                                        <input type="text" id="ox3_outstanding_price" value="13,000" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox3_outstanding', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">우수함 (1,251kg)</div>
+                                        <input type="text" id="ox3_excellent_price" value="15,000" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox3_excellent', this.value)">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 4티어 -->
+                            <div style="text-align: center;">
+                                <h5 style="color: #667eea; font-weight: 600; margin-bottom: 10px;">4티어</h5>
+                                <div style="display: grid; gap: 8px;">
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">일반 (1,165kg)</div>
+                                        <input type="text" id="ox4_normal_price" value="35,739" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox4_normal', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">좋음 (1,228kg)</div>
+                                        <input type="text" id="ox4_good_price" value="35,739" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox4_good', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">뛰어남 (1,294kg)</div>
+                                        <input type="text" id="ox4_outstanding_price" value="42,572" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox4_outstanding', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">우수함 (1,362kg)</div>
+                                        <input type="text" id="ox4_excellent_price" value="50,754" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox4_excellent', this.value)">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 5티어 -->
+                            <div style="text-align: center;">
+                                <h5 style="color: #667eea; font-weight: 600; margin-bottom: 10px;">5티어</h5>
+                                <div style="display: grid; gap: 8px;">
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">일반 (1,338kg)</div>
+                                        <input type="text" id="ox5_normal_price" value="85,633" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox5_normal', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">좋음 (1,406kg)</div>
+                                        <input type="text" id="ox5_good_price" value="85,633" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox5_good', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">뛰어남 (1,447kg)</div>
+                                        <input type="text" id="ox5_outstanding_price" value="95,667" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox5_outstanding', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">우수함 (1,551kg)</div>
+                                        <input type="text" id="ox5_excellent_price" value="109,414" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox5_excellent', this.value)">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 6티어 -->
+                            <div style="text-align: center;">
+                                <h5 style="color: #667eea; font-weight: 600; margin-bottom: 10px;">6티어</h5>
+                                <div style="display: grid; gap: 8px;">
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">일반 (1,574kg)</div>
+                                        <input type="text" id="ox6_normal_price" value="217,818" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox6_normal', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">좋음 (1,651kg)</div>
+                                        <input type="text" id="ox6_good_price" value="217,818" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox6_good', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">뛰어남 (1,730kg)</div>
+                                        <input type="text" id="ox6_outstanding_price" value="238,917" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox6_outstanding', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">우수함 (1,813kg)</div>
+                                        <input type="text" id="ox6_excellent_price" value="264,648" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox6_excellent', this.value)">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 7티어 -->
+                            <div style="text-align: center;">
+                                <h5 style="color: #667eea; font-weight: 600; margin-bottom: 10px;">7티어</h5>
+                                <div style="display: grid; gap: 8px;">
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">일반 (1,876kg)</div>
+                                        <input type="text" id="ox7_normal_price" value="570,169" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox7_normal', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">좋음 (1,964kg)</div>
+                                        <input type="text" id="ox7_good_price" value="570,169" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox7_good', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">뛰어남 (2,056kg)</div>
+                                        <input type="text" id="ox7_outstanding_price" value="569,961" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox7_outstanding', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">우수함 (2,152kg)</div>
+                                        <input type="text" id="ox7_excellent_price" value="628,990" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox7_excellent', this.value)">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 8티어 -->
+                            <div style="text-align: center;">
+                                <h5 style="color: #667eea; font-weight: 600; margin-bottom: 10px;">8티어</h5>
+                                <div style="display: grid; gap: 8px;">
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">일반 (2,252kg)</div>
+                                        <input type="text" id="ox8_normal_price" value="1,659,956" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox8_normal', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">좋음 (2,355kg)</div>
+                                        <input type="text" id="ox8_good_price" value="1,659,956" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox8_good', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">뛰어남 (2,462kg)</div>
+                                        <input type="text" id="ox8_outstanding_price" value="1,677,557" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox8_outstanding', this.value)">
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 11px; color: #666; margin-bottom: 3px;">우수함 (2,573kg)</div>
+                                        <input type="text" id="ox8_excellent_price" value="1,742,522" style="width: 100%; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; text-align: center;" oninput="formatMountPrice('ox8_excellent', this.value)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 파이 설정 -->
+                        <div style="border-top: 1px solid #e9ecef; padding-top: 20px;">
+                            <h5 style="color: #667eea; font-weight: 600; margin-bottom: 15px; text-align: center;">🥧 파이 버프</h5>
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">3T 치킨 (10% 버프)</div>
+                                    <input type="text" id="chicken_pie_price" value="481" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; text-align: center;" oninput="formatPiePrice('chicken', this.value)">
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">5T 거위 (20% 버프)</div>
+                                    <input type="text" id="goose_pie_price" value="2,459" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; text-align: center;" oninput="formatPiePrice('goose', this.value)">
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">7T 돼지 (30% 버프)</div>
+                                    <input type="text" id="pork_pie_price" value="5,115" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; text-align: center;" oninput="formatPiePrice('pork', this.value)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <div style="text-align: center;">
+                        <button onclick="resetMountPrices()" style="padding: 10px 25px; border: 2px solid #dc3545; background: white; color: #dc3545; border-radius: 25px; cursor: pointer; font-weight: 600; margin-right: 10px;">기본값으로 초기화</button>
+                        <button onclick="toggleSettings()" style="padding: 10px 25px; border: 2px solid #28a745; background: white; color: #28a745; border-radius: 25px; cursor: pointer; font-weight: 600;">설정 완료</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentRate = 93.5;
+
+        const items = [
+            { sellPrice: 5000, weight: 5, name: '5kg 아이템' },
+            { sellPrice: 1000, weight: 2.5, name: '2.5kg 아이템' },
+            { sellPrice: 25000, weight: 6.3, name: '6.3kg 아이템' }
+        ];
+
+        const defaultMountPrices = {
+            ox3_normal: 13000, ox3_good: 13000, ox3_outstanding: 13000, ox3_excellent: 15000,
+            ox4_normal: 35739, ox4_good: 35739, ox4_outstanding: 42572, ox4_excellent: 50754,
+            ox5_normal: 85633, ox5_good: 85633, ox5_outstanding: 95667, ox5_excellent: 109414,
+            ox6_normal: 217818, ox6_good: 217818, ox6_outstanding: 238917, ox6_excellent: 264648,
+            ox7_normal: 570169, ox7_good: 570169, ox7_outstanding: 569961, ox7_excellent: 628990,
+            ox8_normal: 1659956, ox8_good: 1659956, ox8_outstanding: 1677557, ox8_excellent: 1742522
+        };
+
+        const defaultPiePrices = {
+            chicken: 481, goose: 2459, pork: 5115
+        };
+
+        const mounts = {
+            ox3_normal: { capacity: 1058, price: 13000, name: '3티어 황소 일반' },
+            ox3_good: { capacity: 1120, price: 13000, name: '3티어 황소 좋음' },
+            ox3_outstanding: { capacity: 1184, price: 13000, name: '3티어 황소 뛰어남' },
+            ox3_excellent: { capacity: 1251, price: 15000, name: '3티어 황소 우수함' },
+            
+            ox4_normal: { capacity: 1165, price: 35739, name: '4티어 황소 일반' },
+            ox4_good: { capacity: 1228, price: 35739, name: '4티어 황소 좋음' },
+            ox4_outstanding: { capacity: 1294, price: 42572, name: '4티어 황소 뛰어남' },
+            ox4_excellent: { capacity: 1362, price: 50754, name: '4티어 황소 우수함' },
+            
+            ox5_normal: { capacity: 1338, price: 85633, name: '5티어 황소 일반' },
+            ox5_good: { capacity: 1406, price: 85633, name: '5티어 황소 좋음' },
+            ox5_outstanding: { capacity: 1447, price: 95667, name: '5티어 황소 뛰어남' },
+            ox5_excellent: { capacity: 1551, price: 109414, name: '5티어 황소 우수함' },
+            
+            ox6_normal: { capacity: 1574, price: 217818, name: '6티어 황소 일반' },
+            ox6_good: { capacity: 1651, price: 217818, name: '6티어 황소 좋음' },
+            ox6_outstanding: { capacity: 1730, price: 238917, name: '6티어 황소 뛰어남' },
+            ox6_excellent: { capacity: 1813, price: 264648, name: '6티어 황소 우수함' },
+            
+            ox7_normal: { capacity: 1876, price: 570169, name: '7티어 황소 일반' },
+            ox7_good: { capacity: 1964, price: 570169, name: '7티어 황소 좋음' },
+            ox7_outstanding: { capacity: 2056, price: 569961, name: '7티어 황소 뛰어남' },
+            ox7_excellent: { capacity: 2152, price: 628990, name: '7티어 황소 우수함' },
+            
+            ox8_normal: { capacity: 2252, price: 1659956, name: '8티어 황소 일반' },
+            ox8_good: { capacity: 2355, price: 1659956, name: '8티어 황소 좋음' },
+            ox8_outstanding: { capacity: 2462, price: 1677557, name: '8티어 황소 뛰어남' },
+            ox8_excellent: { capacity: 2573, price: 1742522, name: '8티어 황소 우수함' }
+        };
+
+        const pies = {
+            none: { buff: 0, price: 0, name: '사용 안함' },
+            chicken: { buff: 10, price: 481, name: '3티어 치킨 파이' },
+            goose: { buff: 20, price: 2459, name: '5티어 거위 파이' },
+            pork: { buff: 30, price: 5115, name: '7티어 돼지고기 파이' }
+        };
+
+        function setMode(rate) {
+            currentRate = rate;
+            
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            updateStep1();
+        }
+
+        const updateStep1 = checkStepsCompletion;
+        const updateStep2 = checkStepsCompletion;
+
+
+
+        function checkStepsCompletion() {
+            const prices = [
+                parseFloat(document.getElementById('price-0').value) || 0,
+                parseFloat(document.getElementById('price-1').value) || 0,
+                parseFloat(document.getElementById('price-2').value) || 0
+            ];
+            
+            const investment = getInvestmentValue();
+            
+            const hasPrice = prices.some(price => price > 0);
+            const hasInvestment = investment > 0;
+            
+            const optimizeBtn = document.getElementById('optimize-btn');
+            optimizeBtn.disabled = !(hasPrice && hasInvestment);
+        }
+
+        function findBothOptimalSettings() {
+            const efficiencySetting = findOptimalSetting('efficiency');
+            const profitSetting = findOptimalSetting('profit');
+            
+            if (efficiencySetting && profitSetting) {
+                displayBothResults(efficiencySetting, profitSetting);
+            } else {
+                alert('최적 세팅을 찾을 수 없습니다.');
+            }
+        }
+        
+        function findOptimalSetting(mode) {
+            const investmentAmount = getInvestmentValue();
+            const itemPrices = [
+                parseFloat(document.getElementById('price-0').value) || 0,
+                parseFloat(document.getElementById('price-1').value) || 0,
+                parseFloat(document.getElementById('price-2').value) || 0
+            ];
+            
+            let bestSetting = null;
+            let bestScore = mode === 'efficiency' ? -Infinity : -Infinity;
+            
+            // 모든 탈것/파이 조합 테스트
+            Object.keys(mounts).forEach(mountKey => {
+                Object.keys(pies).forEach(pieKey => {
+                    const mount = mounts[mountKey];
+                    const pie = pies[pieKey];
+                    const actualCapacity = Math.floor(mount.capacity * (1 + pie.buff / 100));
+                    const fixedCost = mount.price + pie.price;
+                    
+                    // 각 아이템에 대해 최적 수량 계산
+                    items.forEach((item, itemIndex) => {
+                        const itemPrice = itemPrices[itemIndex];
+                        if (itemPrice <= 0) return;
+                        
+                        let maxQuantity, totalInvestment, availableForItems;
+                        
+                        // 두 모드 모두 투자금액 내에서 계산
+                        if (fixedCost >= investmentAmount) return;
+                        availableForItems = investmentAmount - fixedCost;
+                        const maxByMoney = Math.floor(availableForItems / itemPrice);
+                        const maxByWeight = Math.floor(actualCapacity / item.weight);
+                        maxQuantity = Math.min(maxByMoney, maxByWeight);
+                        totalInvestment = fixedCost + (maxQuantity * itemPrice);
+                        
+                        if (maxQuantity <= 0) return;
+                        
+                        const totalItemCost = maxQuantity * itemPrice;
+                        const revenue = maxQuantity * item.sellPrice * (currentRate / 100);
+                        const profit = revenue - totalItemCost - fixedCost;
+                        
+                        let score;
+                        if (mode === 'efficiency') {
+                            // 효율성: 실제 투자 대비 수익 비율 (적은 투자로 높은 수익)
+                            score = totalInvestment > 0 ? profit / totalInvestment : 0;
+                        } else {
+                            // 수익률: 설정된 투자금액 대비 수익률
+                            score = (profit / investmentAmount) * 100;
+                        }
+                        
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestSetting = {
+                                mode, mountKey, pieKey, itemIndex, quantity: maxQuantity,
+                                mount, pie, item, actualCapacity, fixedCost,
+                                totalItemCost, revenue, profit, 
+                                totalInvestment: totalInvestment,
+                                efficiency: (profit / totalInvestment) * 100,
+                                itemPrice, score
+                            };
+                        }
+                    });
+                });
+            });
+            
+            return bestSetting;
+        }
+
+        function displayBothResults(efficiencySetting, profitSetting) {
+            const t = translations[currentLanguage];
+            const isKo = currentLanguage === 'ko';
+            
+            // 결과 제목 업데이트
+            document.querySelector('.optimal-result h3').textContent = t.efficiencyTitle;
+            document.querySelector('.calculation-result h3').textContent = t.profitTitle;
+            
+            // 효율성 최대화 결과
+            document.getElementById('efficiency-details').innerHTML = `
+                <div style="text-align: center; margin-bottom: 15px; font-size: 14px; opacity: 0.8;">
+                    ${isKo ? '가장 적은 투자로 최대 수익' : 'Maximum profit with minimal investment'}
+                </div>
+                <div class="optimal-details">
+                    <strong>${isKo ? '🐂 탈것:' : '🐂 Mount:'}</strong> ${isKo ? efficiencySetting.mount.name : efficiencySetting.mount.name.replace(/티어|황소|일반|좋음|뛰어남|우수함/g, m => ({'티어':'T','황소':'Ox','일반':'Normal','좋음':'Good','뛰어남':'Outstanding','우수함':'Excellent'}[m]))}<br>
+                    <strong>${isKo ? '🥧 버프:' : '🥧 Buff:'}</strong> ${isKo ? efficiencySetting.pie.name : efficiencySetting.pie.name.replace(/티어|치킨 파이|거위 파이|돼지고기 파이|사용 안함/g, m => ({'티어':'T','치킨 파이':'Chicken Pie','거위 파이':'Goose Pie','돼지고기 파이':'Pork Pie','사용 안함':'None'}[m]))}<br>
+                    <strong>${isKo ? '📦 아이템:' : '📦 Item:'}</strong> ${isKo ? efficiencySetting.item.name : efficiencySetting.item.name.replace('아이템', 'Item')} × ${efficiencySetting.quantity}${isKo ? '개' : ' items'}<br>
+                    <strong>${isKo ? '📏 최대적재량:' : '📏 Max Capacity:'}</strong> ${efficiencySetting.actualCapacity}kg
+                </div>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.3);">
+                    <div class="result-item" style="color: white; border: none; padding: 5px 0;">
+                        <span>${isKo ? '💰 투자금:' : '💰 Investment:'}</span>
+                        <span style="font-weight: bold;">${efficiencySetting.totalInvestment.toLocaleString()}${isKo ? '실버' : ' Silver'}</span>
+                    </div>
+                    <div class="result-item" style="color: white; border: none; padding: 5px 0;">
+                        <span>${isKo ? '📈 순이익:' : '📈 Net Profit:'}</span>
+                        <span style="font-weight: bold;">${Math.round(efficiencySetting.profit).toLocaleString()}${isKo ? '실버' : ' Silver'}</span>
+                    </div>
+                    <div class="result-item" style="color: white; border: none; padding: 5px 0;">
+                        <span>${isKo ? '🎯 수익률:' : '🎯 Profit Rate:'}</span>
+                        <span style="font-weight: bold;">${efficiencySetting.efficiency.toFixed(1)}%</span>
+                    </div>
+                </div>
+            `;
+            
+            // 수익률 최대화 결과
+            document.getElementById('profit-details').innerHTML = `
+                <div style="text-align: center; margin-bottom: 15px; font-size: 14px; color: #666;">
+                    ${isKo ? '설정 투자금액 대비 최고 수익률' : 'Highest profit rate within set investment'}
+                </div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <strong>${isKo ? '🐂 탈것:' : '🐂 Mount:'}</strong> ${isKo ? profitSetting.mount.name : profitSetting.mount.name.replace(/티어|황소|일반|좋음|뛰어남|우수함/g, m => ({'티어':'T','황소':'Ox','일반':'Normal','좋음':'Good','뛰어남':'Outstanding','우수함':'Excellent'}[m]))}<br>
+                    <strong>${isKo ? '🥧 버프:' : '🥧 Buff:'}</strong> ${isKo ? profitSetting.pie.name : profitSetting.pie.name.replace(/티어|치킨 파이|거위 파이|돼지고기 파이|사용 안함/g, m => ({'티어':'T','치킨 파이':'Chicken Pie','거위 파이':'Goose Pie','돼지고기 파이':'Pork Pie','사용 안함':'None'}[m]))}<br>
+                    <strong>${isKo ? '📦 아이템:' : '📦 Item:'}</strong> ${isKo ? profitSetting.item.name : profitSetting.item.name.replace('아이템', 'Item')} × ${profitSetting.quantity}${isKo ? '개' : ' items'}<br>
+                    <strong>${isKo ? '📏 최대적재량:' : '📏 Max Capacity:'}</strong> ${profitSetting.actualCapacity}kg
+                </div>
+                <div class="result-item">
+                    <span class="result-label">${isKo ? '💰 투자금' : '💰 Investment'}</span>
+                    <span class="result-value">${profitSetting.totalInvestment.toLocaleString()}${isKo ? '실버' : ' Silver'}</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">${isKo ? '📈 순이익' : '📈 Net Profit'}</span>
+                    <span class="result-value ${profitSetting.profit >= 0 ? 'profit-positive' : 'profit-negative'}">
+                        ${Math.round(profitSetting.profit).toLocaleString()}${isKo ? '실버' : ' Silver'}
+                    </span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">${isKo ? '🎯 수익률' : '🎯 Profit Rate'}</span>
+                    <span class="result-value ${profitSetting.efficiency >= 0 ? 'profit-positive' : 'profit-negative'}">
+                        ${profitSetting.efficiency.toFixed(1)}%
+                    </span>
+                </div>
+            `;
+            
+            document.getElementById('results-container').classList.remove('hidden');
+            document.getElementById('results-container').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function formatInvestmentInput() {
+            const input = document.getElementById('investment-amount');
+            const cursorPosition = input.selectionStart;
+            const oldValue = input.value;
+            
+            let value = input.value.replace(/,/g, '');
+            if (value === '' || isNaN(value)) {
+                updateStep2();
+                return;
+            }
+            
+            const newValue = parseInt(value).toLocaleString();
+            input.value = newValue;
+            
+            // 커서 위치 조정 - 콤마 개수 변화 고려
+            const oldCommas = (oldValue.match(/,/g) || []).length;
+            const newCommas = (newValue.match(/,/g) || []).length;
+            const commaDiff = newCommas - oldCommas;
+            
+            const newCursorPosition = Math.max(0, Math.min(newValue.length, cursorPosition + commaDiff));
+            input.setSelectionRange(newCursorPosition, newCursorPosition);
+            
+            updateStep2();
+        }
+
+        function getInvestmentValue() {
+            const value = document.getElementById('investment-amount').value.replace(/,/g, '');
+            return parseFloat(value) || 0;
+        }
+
+        let currentLanguage = 'ko';
+        
+        const translations = {
+            ko: {
+                mainTitle: '🏪 알비온 명품 무역 최적화 계산기',
+                mainSubtitle: '단계별 가이드로 최적의 무역 수익을 찾아보세요',
+                settingsOpen: '가격 설정 및 정보 보기',
+                settingsClose: '가격 설정 및 정보 닫기',
+                step1Title: '현재 아이템 시세 입력',
+                step2Title: '투자 가능 금액 설정',
+                step3Title: '최적 세팅 찾기',
+                step4Title: '최적화 결과',
+                fixedCostTitle: '고정비 설정',
+                contractMode: '구매계약서 사용 (93.5%)',
+                normalMode: '일반 거래 (96%)',
+                item25kg: '📦 2.5kg 아이템 (성공시 1,000원)',
+                item5kg: '📦 5kg 아이템 (성공시 5,000원)',
+                item63kg: '📦 6.3kg 아이템 (성공시 25,000원)',
+                investmentDesc: '한 번의 무역에 투자할 수 있는 실버 금액을 입력하세요',
+                optimizeDesc: '입력한 정보를 바탕으로 두 가지 최적화 방식을 비교해드립니다',
+                optimizeBtn: '🔍 최적 세팅 비교 분석',
+                profitMax: '💰 수익률 최대화: 설정 투자금액 내에서 최고 수익률',
+                efficiencyMax: '⚡ 효율성 최대화: 가장 적은 투자로 최대 수익 (리스크 고려)',
+                efficiencyTitle: '⚡ 효율성 최대화',
+                profitTitle: '💰 수익률 최대화',
+                settingsDesc: '탈것과 파이의 가격을 설정하세요 (빈 값은 기본값 사용)',
+                resetBtn: '기본값으로 초기화',
+                completeBtn: '설정 완료',
+                silver: '실버',
+                ox35Title: '🐂 3-5티어 황소',
+                ox68Title: '🐂 6-8티어 황소',
+                pieTitle: '🥧 파이 버프',
+                tier3Normal: '3T 일반', tier3Good: '3T 좋음', tier3Outstanding: '3T 뛰어남', tier3Excellent: '3T 우수함',
+                tier4Normal: '4T 일반', tier4Good: '4T 좋음', tier4Outstanding: '4T 뛰어남', tier4Excellent: '4T 우수함',
+                tier5Normal: '5T 일반', tier5Good: '5T 좋음', tier5Outstanding: '5T 뛰어남', tier5Excellent: '5T 우수함',
+                tier6Normal: '6T 일반', tier6Good: '6T 좋음', tier6Outstanding: '6T 뛰어남', tier6Excellent: '6T 우수함',
+                tier7Normal: '7T 일반', tier7Good: '7T 좋음', tier7Outstanding: '7T 뛰어남', tier7Excellent: '7T 우수함',
+                tier8Normal: '8T 일반', tier8Good: '8T 좋음', tier8Outstanding: '8T 뛰어남', tier8Excellent: '8T 우수함',
+                pieChicken: '3T 치킨', pieGoose: '5T 거위', piePork: '7T 돼지',
+                placeholder1: '예: 600', placeholder2: '예: 3000', placeholder3: '예: 15000'
+            },
+            en: {
+                mainTitle: '🏪 Albion Luxury Trade Optimizer',
+                mainSubtitle: 'Find optimal trade profits with step-by-step guidance',
+                settingsOpen: 'Price Settings & Info',
+                settingsClose: 'Close Settings & Info',
+                step1Title: 'Enter Current Item Prices',
+                step2Title: 'Set Investment Amount',
+                step3Title: 'Find Optimal Settings',
+                step4Title: 'Optimization Results',
+                fixedCostTitle: 'Fixed Cost Settings',
+                contractMode: 'Purchase Contract (93.5%)',
+                normalMode: 'Normal Trade (96%)',
+                item25kg: '📦 2.5kg Item (1,000 on success)',
+                item5kg: '📦 5kg Item (5,000 on success)',
+                item63kg: '📦 6.3kg Item (25,000 on success)',
+                investmentDesc: 'Enter the silver amount you can invest in one trade',
+                optimizeDesc: 'Compare two optimization methods based on your input',
+                optimizeBtn: '🔍 Analyze Optimal Settings',
+                profitMax: '💰 Profit Maximization: Highest profit rate within set investment',
+                efficiencyMax: '⚡ Efficiency Maximization: Maximum profit with minimal investment (risk considered)',
+                efficiencyTitle: '⚡ Efficiency Maximization',
+                profitTitle: '💰 Profit Maximization',
+                settingsDesc: 'Set mount and pie prices (empty values use defaults)',
+                resetBtn: 'Reset to Defaults',
+                completeBtn: 'Complete Settings',
+                silver: 'Silver',
+                ox35Title: '🐂 Tier 3-5 Oxen',
+                ox68Title: '🐂 Tier 6-8 Oxen',
+                pieTitle: '🥧 Pie Buffs',
+                tier3Normal: 'T3 Normal', tier3Good: 'T3 Good', tier3Outstanding: 'T3 Outstanding', tier3Excellent: 'T3 Excellent',
+                tier4Normal: 'T4 Normal', tier4Good: 'T4 Good', tier4Outstanding: 'T4 Outstanding', tier4Excellent: 'T4 Excellent',
+                tier5Normal: 'T5 Normal', tier5Good: 'T5 Good', tier5Outstanding: 'T5 Outstanding', tier5Excellent: 'T5 Excellent',
+                tier6Normal: 'T6 Normal', tier6Good: 'T6 Good', tier6Outstanding: 'T6 Outstanding', tier6Excellent: 'T6 Excellent',
+                tier7Normal: 'T7 Normal', tier7Good: 'T7 Good', tier7Outstanding: 'T7 Outstanding', tier7Excellent: 'T7 Excellent',
+                tier8Normal: 'T8 Normal', tier8Good: 'T8 Good', tier8Outstanding: 'T8 Outstanding', tier8Excellent: 'T8 Excellent',
+                pieChicken: 'T3 Chicken', pieGoose: 'T5 Goose', piePork: 'T7 Pork',
+                placeholder1: 'e.x. 600', placeholder2: 'e.x. 3000', placeholder3: 'e.x. 15000'
+            }
+        };
+        
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            const t = translations[lang];
+            
+            // 메인 타이틀
+            document.getElementById('main-title').textContent = t.mainTitle;
+            document.getElementById('main-subtitle').textContent = t.mainSubtitle;
+            
+            // 단계 제목들
+            document.querySelectorAll('.step-title')[0].textContent = t.step1Title;
+            document.querySelectorAll('.step-title')[1].textContent = t.step2Title;
+            document.querySelectorAll('.step-title')[2].textContent = t.step3Title;
+            document.querySelectorAll('.step-title')[3].textContent = t.step4Title;
+            document.querySelectorAll('.step-title')[4].textContent = t.fixedCostTitle;
+            
+            // 모드 버튼
+            document.querySelectorAll('.mode-btn')[0].textContent = t.contractMode;
+            document.querySelectorAll('.mode-btn')[1].textContent = t.normalMode;
+            
+            // 아이템 제목 및 placeholder
+            document.querySelectorAll('.price-item h3')[0].textContent = t.item25kg;
+            document.querySelectorAll('.price-item h3')[1].textContent = t.item5kg;
+            document.querySelectorAll('.price-item h3')[2].textContent = t.item63kg;
+            
+            // placeholder 텍스트
+            document.getElementById('price-1').placeholder = t.placeholder1;
+            document.getElementById('price-0').placeholder = t.placeholder2;
+            document.getElementById('price-2').placeholder = t.placeholder3;
+            
+            // 설명 텍스트
+            document.querySelector('.investment-section p').textContent = t.investmentDesc;
+            document.querySelector('#optimize-btn').previousElementSibling.textContent = t.optimizeDesc;
+            document.querySelector('#optimize-btn').textContent = t.optimizeBtn;
+            
+            // 최적화 설명
+            document.querySelectorAll('#optimize-btn + div div')[0].textContent = t.profitMax;
+            document.querySelectorAll('#optimize-btn + div div')[1].textContent = t.efficiencyMax;
+            
+            // 실버 텍스트 (최적화)
+            document.querySelectorAll('.price-input-group span, .investment-section span').forEach(span => {
+                if (span.textContent.includes('실버')) span.textContent = t.silver;
+            });
+            
+            // 설정 버튼 및 설명
+            const settingsPanel = document.getElementById('settings-panel');
+            const settingsBtn = document.getElementById('settings-btn');
+            settingsBtn.textContent = settingsPanel.classList.contains('hidden') ? t.settingsOpen : t.settingsClose;
+            
+            // 설정 패널 번역 (간소화)
+            const desc = settingsPanel?.querySelector('p');
+            if (desc) desc.textContent = t.settingsDesc;
+            
+            const titles = settingsPanel?.querySelectorAll('h4, h5');
+            if (titles) {
+                titles[0] && (titles[0].textContent = '🐂 황소 및 파이 가격 설정');
+                titles[7] && (titles[7].textContent = '🥧 파이 버프');
+            }
+            
+            const buttons = settingsPanel?.querySelectorAll('button');
+            if (buttons) {
+                buttons[0] && (buttons[0].textContent = t.resetBtn);
+                buttons[1] && (buttons[1].textContent = t.completeBtn);
+            }
+            
+            // 언어 버튼 스타일 업데이트
+            document.getElementById('lang-ko').style.background = lang === 'ko' ? 'white' : 'transparent';
+            document.getElementById('lang-ko').style.color = lang === 'ko' ? '#667eea' : 'white';
+            document.getElementById('lang-ko').style.borderColor = lang === 'ko' ? 'white' : 'rgba(255,255,255,0.5)';
+            
+            document.getElementById('lang-en').style.background = lang === 'en' ? 'white' : 'transparent';
+            document.getElementById('lang-en').style.color = lang === 'en' ? '#667eea' : 'white';
+            document.getElementById('lang-en').style.borderColor = lang === 'en' ? 'white' : 'rgba(255,255,255,0.5)';
+        }
+        
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            const btn = document.getElementById('settings-btn');
+            const t = translations[currentLanguage];
+            
+            panel.classList.toggle('hidden');
+            btn.textContent = panel.classList.contains('hidden') ? t.settingsOpen : t.settingsClose;
+        }
+
+
+
+        function formatMountPrice(mountKey, value) {
+            const input = document.getElementById(mountKey + '_price');
+            const cursorPosition = input.selectionStart;
+            const oldValue = input.value;
+            
+            let cleanValue = value.replace(/,/g, '');
+            if (cleanValue === '' || isNaN(cleanValue)) {
+                mounts[mountKey].price = defaultMountPrices[mountKey];
+                return;
+            }
+            
+            const numericValue = parseInt(cleanValue);
+            const formattedValue = numericValue.toLocaleString();
+            input.value = formattedValue;
+            
+            // 커서 위치 조정
+            const oldCommas = (oldValue.match(/,/g) || []).length;
+            const newCommas = (formattedValue.match(/,/g) || []).length;
+            const commaDiff = newCommas - oldCommas;
+            const newCursorPosition = Math.max(0, Math.min(formattedValue.length, cursorPosition + commaDiff));
+            input.setSelectionRange(newCursorPosition, newCursorPosition);
+            
+            mounts[mountKey].price = numericValue;
+        }
+
+        function formatPiePrice(pieKey, value) {
+            const input = document.getElementById(pieKey + '_pie_price');
+            const cursorPosition = input.selectionStart;
+            const oldValue = input.value;
+            
+            let cleanValue = value.replace(/,/g, '');
+            if (cleanValue === '' || isNaN(cleanValue)) {
+                pies[pieKey].price = defaultPiePrices[pieKey];
+                return;
+            }
+            
+            const numericValue = parseInt(cleanValue);
+            const formattedValue = numericValue.toLocaleString();
+            input.value = formattedValue;
+            
+            // 커서 위치 조정
+            const oldCommas = (oldValue.match(/,/g) || []).length;
+            const newCommas = (formattedValue.match(/,/g) || []).length;
+            const commaDiff = newCommas - oldCommas;
+            const newCursorPosition = Math.max(0, Math.min(formattedValue.length, cursorPosition + commaDiff));
+            input.setSelectionRange(newCursorPosition, newCursorPosition);
+            
+            pies[pieKey].price = numericValue;
+        }
+
+        function resetMountPrices() {
+            Object.keys(defaultMountPrices).forEach(key => {
+                mounts[key].price = defaultMountPrices[key];
+                const input = document.getElementById(key + '_price');
+                if (input) input.value = defaultMountPrices[key].toLocaleString();
+            });
+            Object.keys(defaultPiePrices).forEach(key => {
+                pies[key].price = defaultPiePrices[key];
+                const input = document.getElementById(key + '_pie_price');
+                if (input) input.value = defaultPiePrices[key].toLocaleString();
+            });
+        }
+
+        // 페이지 로드시 초기 설정
+        window.onload = function() {
+            document.getElementById('investment-amount').value = '1,000,000';
+            checkStepsCompletion();
+        };
+    </script>
+</body>
+</html>
